@@ -14,16 +14,18 @@ export default function Page() {
     loadData();
   }, [loadData]);
 
-  console.log("userId:",user.id);
-  
+  console.log("userId:",user.id);  
   console.log("Transactions:", transactions);
   console.log("Summary:",summary);
   
   
   return (
-    <View>
+    <View>  
       <SignedIn>
         <Text>Hello {user?.emailAddresses[0].emailAddress}</Text>
+        <Text>{summary.income}</Text>
+        <Text>{summary.balance}</Text>
+        <Text>{summary.expenses}</Text>
         <SignOutButton />
       </SignedIn>
       <SignedOut>
@@ -34,6 +36,6 @@ export default function Page() {
           <Text>Sign up</Text>
         </Link>
       </SignedOut>
-    </View>
+    </View> 
   );
 }

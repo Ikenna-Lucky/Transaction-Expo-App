@@ -4,7 +4,7 @@ import { Alert } from "react-native";
 
 const useTransactions = (userId) => {
   const backendUrl = "http://localhost:4000/api";
-  const [transaction, setTransaction] = useState([]);
+  const [transactions, setTransactions] = useState([]);
   const [summary, setSummary] = useState({
     balance: 0,
     income: 0,
@@ -17,7 +17,8 @@ const useTransactions = (userId) => {
     try {
       const response = await fetch(`${backendUrl}/transactions/${userId}`);
       const data = await response.json();
-      setTransaction(data);
+      setTransactions(data);
+      console.log("Fetched Transactions:", data); 
     } catch (error) {
       console.error("Error fetching transactions:", error);
     }
@@ -29,9 +30,9 @@ const useTransactions = (userId) => {
         `${backendUrl}/transactions/summary/${userId}`
       );
       const data = await response.json();
-      setTransaction(data);
+      setSummary(data);
     } catch (error) {
-      console.error("Error fetching transactions:", error);
+      console.error("Error fetching summary:", error);
     }
   }, [userId]);
 
@@ -43,8 +44,8 @@ const useTransactions = (userId) => {
       //best practice is to use Promise.all to fetch both transactions and summary at the same time
       await Promise.all([fetchTransactions(), fetchSummary()]);
       //Doing it this way means the first fetch will be done before the second one, so we can avoid
-      fetchTransactions();
-      fetchSummary();
+      // fetchTransactions();
+      // fetchSummary();
     } catch (error) {
       console.error("Error Loading Data:", error);
     } finally {
@@ -72,7 +73,7 @@ const useTransactions = (userId) => {
   };
 
   return {
-    transaction,
+    transactions,
     summary,
     isLoading,
     loadData,

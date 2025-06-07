@@ -6,14 +6,14 @@ import {
   postTransaction,
 } from "../controllers/transactionController.js";
 
-const router = express.Router();
+const transactionRoute = express.Router();
 
-router.post("/", postTransaction);
+transactionRoute.post("/", postTransaction);
 
-router.get("/:userId", getTransactions);
+transactionRoute.get("/:userId", getTransactions);
 
-router.delete("/:id", deleteTransaction);
+transactionRoute.delete("/:id", deleteTransaction);
 
-router.get("/summary/:userId", getTransactionSummary);
+transactionRoute.get("/summary/:userId", getTransactionSummary);
 
-export default router;
+export default transactionRoute;
