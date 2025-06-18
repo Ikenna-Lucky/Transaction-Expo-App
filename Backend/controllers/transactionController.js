@@ -1,4 +1,4 @@
-import { sql } from "../../src/config/db.js";
+import { sql } from "../config/db.js";
 
 const postTransaction = async (req, res) => {
   //title, amount, category, user_id
