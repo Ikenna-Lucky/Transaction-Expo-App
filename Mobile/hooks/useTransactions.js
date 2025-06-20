@@ -3,7 +3,7 @@ import React, { useCallback, useState } from "react";
 import { Alert } from "react-native";
 
 const useTransactions = (userId) => {
-  const backendUrl = "https://transaction-api-rho.vercel.app/api";
+  const backendUrl = "https://transaction-api-sage.vercel.app//api";
   const [transactions, setTransactions] = useState([]);
   const [summary, setSummary] = useState({ 
     balance: 0,
