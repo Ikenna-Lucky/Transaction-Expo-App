@@ -13,7 +13,7 @@ const initDB = async () => {
     amount DECIMAL(10, 2) NOT NULL,
     title VARCHAR(50) NOT NULL,
     category VARCHAR(50) NOT NULL,
-    cteated_at DATE NOT NULL DEFAULT CURRENT_DATE)`;
+    created_at DATE NOT NULL DEFAULT CURRENT_DATE)`;
 
     console.log("Database connected successfully!");
   } catch (error) {

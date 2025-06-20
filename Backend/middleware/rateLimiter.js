@@ -3,15 +3,17 @@ import rateLimit from "../config/upstash.js";
 const rateLimiter = async (req, res, next) => {
   try {
     // In a real world app, you'd like to put the userId or IP Address as your key
-    const { success } = await rateLimit.limit("my-rate-limit");
+    const identifier = req.ip || "127.0.0.1";
+    const { success } = await rateLimit.limit(identifier);
     if (!success) {
       return res
         .status(429)
         .json({ message: "Too many requests, please try again later." });
     }
+    next();
   } catch (error) {
     console.log("Rate limit error", error);
-    next(error);
+    return next(error);
   }
 };
 

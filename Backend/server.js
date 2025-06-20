@@ -6,6 +6,10 @@ import { initDB } from "./config/db.js";
 
 const app = express();
 
+// Set the "trust proxy" setting
+// This is crucial for rate limiting and other IP-based security to work correctly on Vercel.
+app.set('trust proxy', 1);
+
 app.use(rateLimiter);
 app.use(express.json()); // Middleware to parse JSON bodies
 
