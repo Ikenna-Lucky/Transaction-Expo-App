@@ -58,16 +58,23 @@ const getTransactionSummary = async (req, res) => {
   try {
     const { userId } = req.params;
 
-    const summaryResult = await sql`
-      SELECT 
-        COALESCE(SUM(amount), 0) as balance,
-        COALESCE(SUM(CASE WHEN amount > 0 THEN amount ELSE 0 END), 0) as income,
-        COALESCE(SUM(CASE WHEN amount < 0 THEN amount ELSE 0 END), 0) as expenses
-      FROM transactions 
-      WHERE user_id = ${userId};
-    `;
+    const balanceResult = await sql`
+          SELECT COALESCE(SUM(amount), 0) as balance FROM transactions WHERE user_id = ${userId};
+        `;
 
-    res.status(200).json(summaryResult[0]);
+    const incomeResult = await sql`
+          SELECT COALESCE(SUM(amount), 0) as income FROM transactions WHERE user_id = ${userId} AND amount > 0;
+        `;
+
+    const expensesResult = await sql`
+          SELECT COALESCE(SUM(amount), 0) as expenses FROM transactions WHERE user_id = ${userId} AND amount < 0;
+        `;
+
+    res.status(200).json({
+      balance: balanceResult[0].balance,
+      income: incomeResult[0].income,
+      expenses: expensesResult[0].expenses,
+    });
   } catch (error) {
     console.log("Error in fetching transaction summary:", error);
     res.status(500).json({ message: "Internal Server Error" });

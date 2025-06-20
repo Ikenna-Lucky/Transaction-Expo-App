@@ -21,6 +21,9 @@ const TransactionData = () => {
     }
   }, [user, loadData]); // Depend on user to refetch if user changes
 
+  console.log("User ID:", user.id); // Log the user ID for debugging
+  console.log("Transaction Summary:", summary); // Log the summary for debugging
+
   // Display a loading indicator while fetching data
   if (isLoading) {
     return (
