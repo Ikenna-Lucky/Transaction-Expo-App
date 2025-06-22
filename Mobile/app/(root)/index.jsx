@@ -1,19 +1,32 @@
 // --- START OF FILE index.jsx (CORRECTED) ---
 
 import { SignedIn, SignedOut, useUser } from "@clerk/clerk-expo";
-import { Link } from "expo-router";
-import { Text, View, ActivityIndicator } from "react-native";
+import { Link, useRouter } from "expo-router";
+import {
+  Text,
+  View,
+  ActivityIndicator,
+  Image,
+  TouchableOpacity,
+  FlatList,
+  Alert,
+} from "react-native";
 import { SignOutButton } from "@/components/SignOutButton";
 import useTransactions from "../../hooks/useTransactions";
 import { useEffect } from "react";
+import { styles } from "../../assets/styles/home.styles";
+import { COLORS } from "@/constants/colors";
+import { Ionicons } from "@expo/vector-icons";
+import { BalanceCard } from "@/components/BalanceCard";
+import { TransactionItem } from "@/components/TransactionItem";
 
 // 1. Create a new component for authenticated content
-const TransactionData = () => {
+export default function Page() {
   const { user } = useUser();
+  const router = useRouter();
   // We can safely call user.id here because this component is only rendered when signed in.
-  const { summary, isLoading, loadData, deleteTransaction } = useTransactions(
-    user.id
-  ); // Fixed typo: deleteTransactions -> deleteTransaction
+  const { transactions, summary, isLoading, loadData, deleteTransaction } =
+    useTransactions(user?.id); // Fixed typo: deleteTransactions -> deleteTransaction
 
   useEffect(() => {
     if (user) {
@@ -21,50 +34,86 @@ const TransactionData = () => {
     }
   }, [user, loadData]); // Depend on user to refetch if user changes
 
-  console.log("User ID:", user.id); // Log the user ID for debugging
-  console.log("Transaction Summary:", summary); // Log the summary for debugging
+  // console.log("User ID:", user.id); // Log the user ID for debugging
+  // console.log("Transaction Summary:", summary); // Log the summary for debugging
 
+  // Function to handle deletion of a transaction
+  const handleDelete =  (id) => {
+    Alert.alert(
+      "Delete Transaction",
+      "Are you sure you want to delete this transaction?",
+      [
+        {
+          text: "Cancel",
+          style: "cancel",
+        },
+        {
+          text: "Delete",
+          style: "destructive",
+          onPress: () => deleteTransaction(id),
+        },
+      ]
+    );
+  };
   // Display a loading indicator while fetching data
   if (isLoading) {
     return (
-      <View>
-        <Text>Hello {user?.emailAddresses[0].emailAddress}</Text>
-        <ActivityIndicator size="large" color="#0000ff" />
-        <Text>Loading transactions...</Text>
-        <SignOutButton />
+      <View style={styles.loadingContainer}>
+        <ActivityIndicator size="large" color={COLORS.primary} />
       </View>
     );
   }
 
-  // Display the data once loaded
   return (
-    <View>
-      <Text>Hello {user?.emailAddresses[0].emailAddress}</Text>
-      <Text>Income: ${summary.income}</Text>
-      <Text>Balance: ${summary.balance}</Text>
-      <Text>Expenses: ${summary.expenses}</Text>
-      {/* You can map over and display transactions here */}
-      <SignOutButton />
-    </View>
-  );
-};
+    <View style={styles.container}>
+      <View style={styles.content}>
+        {/* Display the header with user information and add transaction button */}
+        <View style={styles.header}>
+          {/* Left hand side for the header */}
+          <View style={styles.headerLeft}>
+            <Image
+              source={require("../../assets/images/logo.png")}
+              style={styles.headerLogo}
+              resizeMode="contain"
+            />
+            <View style={styles.welcomeContainer}>
+              <Text style={styles.welcomeText}>Welcome Back,</Text>
+              <Text style={styles.usernameText}>
+                {user.emailAddresses[0].emailAddress.split("@")[0]}
+              </Text>
+            </View>
+          </View>
+          {/* Right hand side for the header */}
+          <View style={styles.headerRight}>
+            <TouchableOpacity
+              style={styles.addButton}
+              onPress={() => router.push("/create")}
+            >
+              <Ionicons name="add-circle" size={20} color="#fff" />
+              <Text style={styles.addButtonText}>Add</Text>
+            </TouchableOpacity>
+            <SignOutButton />
+          </View>
+        </View>
 
-// 2. Your main page component is now much cleaner
-export default function Page() {
-  return (
-    <View>
-      <SignedIn>
-        {/* Render the new component only when the user is signed in */}
-        <TransactionData />
-      </SignedIn>
-      <SignedOut>
-        <Link href="/(auth)/sign-in">
-          <Text>Sign in</Text>
-        </Link>
-        <Link href="/(auth)/sign-up">
-          <Text>Sign up</Text>
-        </Link>
-      </SignedOut>
+        <BalanceCard summary={summary} />
+        <View style={styles.transactionsHeaderContainer}>
+          <Text style={styles.sectionTitle}>Recent Transactions</Text>
+        </View>
+
+        {/* Other components like TransactionList can be added here */}
+      </View>
+
+      <FlatList
+        style={styles.transactionsList}
+        contentContainerStyle={styles.transactionsListContent}
+        data={transactions}
+        renderItem={({ item }) => 
+          <TransactionItem item={item} onDelete={handleDelete} />
+        }
+      />
     </View>
   );
+
+  // Display the data once loaded
 }
