@@ -10,23 +10,31 @@ import {
   TouchableOpacity,
   FlatList,
   Alert,
+  RefreshControl,
 } from "react-native";
 import { SignOutButton } from "@/components/SignOutButton";
 import useTransactions from "../../hooks/useTransactions";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { styles } from "../../assets/styles/home.styles";
 import { COLORS } from "@/constants/colors";
 import { Ionicons } from "@expo/vector-icons";
 import { BalanceCard } from "@/components/BalanceCard";
 import { TransactionItem } from "@/components/TransactionItem";
-
+import { NoTransactionFound } from "@/components/NoTransactionFound";
 // 1. Create a new component for authenticated content
 export default function Page() {
   const { user } = useUser();
   const router = useRouter();
+  const [refreshing, setRefreshing] = useState(false);
   // We can safely call user.id here because this component is only rendered when signed in.
   const { transactions, summary, isLoading, loadData, deleteTransaction } =
     useTransactions(user?.id); // Fixed typo: deleteTransactions -> deleteTransaction
+
+  const onRefresh = async (params) => {
+    setRefreshing(true);
+    await loadData();
+    setRefreshing(false);
+  };
 
   useEffect(() => {
     if (user) {
@@ -38,7 +46,7 @@ export default function Page() {
   // console.log("Transaction Summary:", summary); // Log the summary for debugging
 
   // Function to handle deletion of a transaction
-  const handleDelete =  (id) => {
+  const handleDelete = (id) => {
     Alert.alert(
       "Delete Transaction",
       "Are you sure you want to delete this transaction?",
@@ -56,7 +64,7 @@ export default function Page() {
     );
   };
   // Display a loading indicator while fetching data
-  if (isLoading) {
+  if (isLoading && !refreshing) {
     return (
       <View style={styles.loadingContainer}>
         <ActivityIndicator size="large" color={COLORS.primary} />
@@ -87,10 +95,9 @@ export default function Page() {
           <View style={styles.headerRight}>
             <TouchableOpacity
               style={styles.addButton}
-              onPress={() => router.push("/create")}
+              onPress={() => router.push("/CreateScreen")}
             >
               <Ionicons name="add-circle" size={20} color="#fff" />
-              <Text style={styles.addButtonText}>Add</Text>
             </TouchableOpacity>
             <SignOutButton />
           </View>
@@ -108,8 +115,13 @@ export default function Page() {
         style={styles.transactionsList}
         contentContainerStyle={styles.transactionsListContent}
         data={transactions}
-        renderItem={({ item }) => 
+        renderItem={({ item }) => (
           <TransactionItem item={item} onDelete={handleDelete} />
+        )}
+        ListEmptyComponent={<NoTransactionFound />}
+        showsVerticalScrollIndicator={false}
+        refreshControl={
+          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
         }
       />
     </View>

@@ -1,9 +1,9 @@
 //react custom hook file
 import React, { useCallback, useState } from "react";
 import { Alert } from "react-native";
+import { backendUrl } from "../constants/api";
 
 const useTransactions = (userId) => {
-  const backendUrl = "https://transaction-api-sage.vercel.app/api";
   const [transactions, setTransactions] = useState([]);
   const [summary, setSummary] = useState({ 
     balance: 0,
