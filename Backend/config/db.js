@@ -5,6 +5,9 @@ import "dotenv/config";
 const sql = neon(process.env.DATABASE_URL);
 
 const initDB = async () => {
+  /*
+  'async' allows the use of 'await' inside the function.
+   */
   try {
     // Import the database connection function
     await sql`CREATE TABLE IF NOT EXISTS transactions (
@@ -18,7 +21,7 @@ const initDB = async () => {
     console.log("Database connected successfully!");
   } catch (error) {
     console.error("Database connection failed:", error);
-    process.exit(1); // Exit the process with failure
+    process.exit(1); // Terminates the Node.js process with exit code 1 (indicating failure).
   }
 };
   

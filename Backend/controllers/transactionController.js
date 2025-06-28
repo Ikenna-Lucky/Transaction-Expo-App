@@ -22,7 +22,7 @@ const postTransaction = async (req, res) => {
 
 const getTransactions = async (req, res) => {
   try {
-    const { userId } = req.params;
+    const { userId } = req.params; //lets you access dynamic values specified in the URL path of your route.
     const transaction =
       await sql`SELECT * FROM transactions WHERE user_id = ${userId} ORDER BY created_at DESC;`;
 
